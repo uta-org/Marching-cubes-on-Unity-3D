@@ -8,12 +8,15 @@ using Unity.Mathematics;
 [BurstCompile]//For test without burst, just remove this flag.
 public struct BuildChunkJob : IJob
 {
-    [ReadOnly]public NativeArray<byte> chunkData;
-    [WriteOnly]public NativeList<float3> vertex;
-    [WriteOnly]public NativeList<float2> uv;
+    [ReadOnly] public NativeArray<byte> chunkData;
+    public NativeList<float3> vertex;
+    [WriteOnly] public NativeList<int> triangles;
+    [WriteOnly] public NativeList<float2> uv;
 
     [ReadOnly] public int isoLevel;
     [ReadOnly] public bool interpolate;
+    [ReadOnly] public bool dualContouring;
+    [ReadOnly] public float terrainSurface;
 
     /// <summary>
     /// Called when run the job.
@@ -24,9 +27,9 @@ public struct BuildChunkJob : IJob
         {
             for (int z = 1; z < Constants.CHUNK_SIZE + 1; z++)//column, start at 1, because Z axis is inverted and need -1 as offset
             {
-                for (int x = 0; x < Constants.CHUNK_SIZE; x++)//line 
+                for (int x = 0; x < Constants.CHUNK_SIZE; x++)//line
                 {
-                    NativeArray<float4> cube = new NativeArray<float4>(8,Allocator.Temp);
+                    NativeArray<float4> cube = new NativeArray<float4>(8, Allocator.Temp);
                     int mat = Constants.NUMBER_MATERIALS;
                     cube[0] = CalculateVertexChunk(x, y, z, ref mat);
                     cube[1] = CalculateVertexChunk(x + 1, y, z, ref mat);
@@ -38,9 +41,7 @@ public struct BuildChunkJob : IJob
                     cube[7] = CalculateVertexChunk(x, y + 1, z - 1, ref mat);
                     CalculateVertex(cube, mat);
                 }
-
             }
-
         }
     }
 
@@ -66,11 +67,49 @@ public struct BuildChunkJob : IJob
             int v2 = jobCornerIndexBFromEdge[jobTriTable[i]];
 
             float weight = 1;//Unused variable, must be used for interpolation terrain
-            if (interpolate)
-                vertex.Add(interporlateVertex(cube[v1], cube[v2], out weight));
-            else
-                vertex.Add(midlePointVertex(cube[v1], cube[v2]));
+                             //if (interpolate)
+                             //    vertex.Add(InterpolateVertex(cube[v1], cube[v2], out weight));
+                             //else
 
+            var indice = vertex.Length;
+
+            if (dualContouring)
+            {
+                // Get the terrain values at either end of our current edge from the cube array created above.
+                float vert1Sample = cube[EdgeIndexes[indice / 2]].w;
+                float vert2Sample = cube[EdgeIndexes[indice / 2 + 1]].w;
+
+                // Calculate the difference between the terrain values.
+                float difference = vert2Sample - vert1Sample;
+
+                // If the difference is 0, then the terrain passes through the middle.
+                if (difference == 0)
+                    difference = terrainSurface;
+                else
+                    difference = (terrainSurface - vert1Sample) / difference;
+
+                // Calculate the point along the edge that passes through.
+
+                var c1 = cube[v1];
+                var c2 = cube[v2];
+
+                var p1 = new float3(c1.x, c1.y, c1.z);
+                var p2 = new float3(c2.x, c2.y, c2.z);
+
+                var vertPosition = p1 + ((p2 - p1) * difference);
+                triangles.Add(VertForIndice(vertPosition));
+            }
+            else
+            {
+                //vertex.Add(MiddlePointVertex(cube[v1], cube[v2]));
+
+                if (interpolate)
+                    vertex.Add(InterpolateVertex(cube[v1], cube[v2], out weight));
+                else
+                    vertex.Add(MiddlePointVertex(cube[v1], cube[v2]));
+
+                triangles.Add(indice);
+            }
 
             const float uvOffset = 0.01f; //Small offset for avoid pick pixels of other textures
             //NEED REWORKING FOR CORRECT WORKING, now have problems with the directions of the uv
@@ -92,9 +131,22 @@ public struct BuildChunkJob : IJob
             else if (i % 6 == 5)
                 uv.Add(new float2(Constants.MATERIAL_SIZE * (colorVert % Constants.MATERIAL_FOR_ROW) + uvOffset,
                                   1 - Constants.MATERIAL_SIZE * Mathf.Floor(colorVert / Constants.MATERIAL_FOR_ROW) - uvOffset));
-
-
         }
+    }
+
+    public int VertForIndice(float3 vert)
+    {
+        // Loop through all the vertices currently in the vertices list.
+        for (int i = 0; i < vertex.Length; i++)
+        {
+            // If we find a vert that matches ours, then simply return this index.
+            if (vertex[i].Equals(vert))
+                return i;
+        }
+
+        // If we didn't find a match, add this vert to the list and return last index.
+        vertex.Add(vert);
+        return vertex.Length - 1;
     }
 
     /// <summary>
@@ -114,24 +166,43 @@ public struct BuildChunkJob : IJob
     }
 
     #region helpMethods
+
     /// <summary>
     /// Calculate a point between two vertex using the weight of each vertex , used in interpolation voxel building.
     /// </summary>
-    public float3 interporlateVertex(float4 p1, float4 p2, out float interpolation)
+    public float3 InterpolateVertex(float4 p1, float4 p2, out float interpolation)
     {
         interpolation = (isoLevel - p1.w) / (p2.w - p1.w);
-        return math.lerp(new float3(p1.x,p1.y,p1.z), new float3(p2.x,p2.y,p2.z), interpolation);
+        return math.lerp(new float3(p1.x, p1.y, p1.z), new float3(p2.x, p2.y, p2.z), interpolation);
     }
+
     /// <summary>
     /// Calculate the middle point between two vertex, for no interpolation voxel building.
     /// </summary>
-    public float3 midlePointVertex(float4 p1, float4 p2)
+    public float3 MiddlePointVertex(float4 p1, float4 p2)
     {
-        return new float3(p1.x+p2.x, p1.y+p2.y, p1.z+p2.z) / 2;
+        return new float3(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z) / 2;
     }
-    #endregion
+
+    #endregion helpMethods
 
     #region mesh building tables
+
+    public static readonly int[] EdgeIndexes = new int[] {
+        0, 1,
+        1, 2,
+        3, 2,
+        0, 3,
+        4, 5,
+        5, 6,
+        7, 6,
+        4, 7,
+        0, 4,
+        1, 5,
+        2, 6,
+        3, 7
+    };
+
     //Mesh build tables
     public static readonly int[] jobEdgeTable = new int[]{
         0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
@@ -454,6 +525,6 @@ public struct BuildChunkJob : IJob
         6,
         7
     };
-    #endregion
 
+    #endregion mesh building tables
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 219536570}
-  m_IndirectSpecularColor: {r: 0.18190634, g: 0.2275866, b: 0.30741623, a: 1}
+  m_IndirectSpecularColor: {r: 0.44873345, g: 0.4987864, b: 0.57568336, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 219536571}
   - component: {fileID: 219536570}
   m_Layer: 0
-  m_Name: Directional Light 1
+  m_Name: Directional Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -212,6 +212,7 @@ Transform:
   m_LocalRotation: {x: -0.23283549, y: 0.8763048, z: -0.4139122, w: 0.080958426}
   m_LocalPosition: {x: 0, y: 20.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -223,6 +224,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 917872863160039548, guid: 0dd8af356d25ee441896c42d31ada3b4,
+        type: 3}
+      propertyPath: isoLevel
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 917872863160039548, guid: 0dd8af356d25ee441896c42d31ada3b4,
+        type: 3}
+      propertyPath: interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 917872863160039548, guid: 0dd8af356d25ee441896c42d31ada3b4,
+        type: 3}
+      propertyPath: useDeprecated
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 917872863160039548, guid: 0dd8af356d25ee441896c42d31ada3b4,
+        type: 3}
+      propertyPath: dualContouring
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2758482650394560724, guid: 0dd8af356d25ee441896c42d31ada3b4,
         type: 3}
       propertyPath: m_RootOrder
@@ -277,6 +298,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206755284426175507, guid: 0dd8af356d25ee441896c42d31ada3b4,
+        type: 3}
+      propertyPath: chunkViewDistance
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 3577543227352792563, guid: 0dd8af356d25ee441896c42d31ada3b4,
         type: 3}
@@ -366,6 +392,7 @@ Transform:
   m_LocalRotation: {x: 0.1625375, y: 0.6281522, z: -0.1363852, w: 0.74860233}
   m_LocalPosition: {x: 0, y: 40, z: 0}
   m_LocalScale: {x: 0.99999994, y: 1, z: 0.99999994}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -410,7 +437,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Settings.lighting
-  serializedVersion: 3
+  serializedVersion: 4
   m_GIWorkflowMode: 0
   m_EnableBakedLightmaps: 1
   m_EnableRealtimeLightmaps: 0
@@ -423,7 +450,7 @@ LightingSettings:
   m_LightmapMaxSize: 1024
   m_BakeResolution: 40
   m_Padding: 2
-  m_TextureCompression: 1
+  m_LightmapCompression: 3
   m_AO: 0
   m_AOMaxDistance: 1
   m_CompAOExponent: 1
@@ -464,6 +491,7 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaDirect: 0.5
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
+  m_PVRTiledBaking: 0
 --- !u!1 &1173524276
 GameObject:
   m_ObjectHideFlags: 0
@@ -492,6 +520,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1858288679}
   m_RootOrder: 1
@@ -571,6 +600,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1858288679}
   m_RootOrder: 2
@@ -684,6 +714,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.000000059604645, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1.0000001, z: 0.99999994}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -778,6 +809,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1886112478}
   - {fileID: 1173524277}
@@ -818,6 +850,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1858288679}
   m_RootOrder: 0

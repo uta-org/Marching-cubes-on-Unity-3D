@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chunk : MonoBehaviour
+public class VoxelChunk : MonoBehaviour
 {
     [Tooltip("Active gizmos that represent the area of the chunk")]
     public bool debug = false;
+
     private byte[] data;
     private int Xpos;
     private int Zpos;
@@ -17,7 +18,7 @@ public class Chunk : MonoBehaviour
     /// Create a Chunk using a byte[] that contain all the data of the chunk.
     /// </summary>
     /// <param name="b"> data of the chunk</param>
-    public Chunk ChunkInit(byte[] b, int x, int z, Region region, bool save)
+    public VoxelChunk ChunkInit(byte[] b, int x, int z, Region region, bool save)
     {
         data = b;
         Xpos = x;
@@ -39,7 +40,7 @@ public class Chunk : MonoBehaviour
 
     public void Update()
     {
-        if(modified)
+        if (modified)
         {
             modified = false;
             changesUnsaved = true;
@@ -47,7 +48,6 @@ public class Chunk : MonoBehaviour
             Mesh myMesh = MeshBuilder.Instance.BuildChunk(data);
             GetComponent<MeshFilter>().mesh = myMesh;
             GetComponent<MeshCollider>().sharedMesh = myMesh;
-
         }
     }
 
@@ -60,9 +60,9 @@ public class Chunk : MonoBehaviour
     public void modifyTerrain(Vector3 vertexPoint, int modification, int mat = 0)
     {
         if (modification > 0)
-            addTerrain(vertexPoint,modification, mat);//A little more costly
+            addTerrain(vertexPoint, modification, mat);//A little more costly
         else
-            removeTerrain(vertexPoint,modification);//Less operations
+            removeTerrain(vertexPoint, modification);//Less operations
     }
 
     /// <summary>
@@ -85,10 +85,10 @@ public class Chunk : MonoBehaviour
     /// <summary>
     /// Similar to the removeTerrain, but when we add terrain we need indicate a color.
     /// </summary>
-    public void addTerrain(Vector3 vertexPoint,int modification, int mat)
+    public void addTerrain(Vector3 vertexPoint, int modification, int mat)
     {
         int isoSurface = MeshBuilder.Instance.isoLevel;
-        int byteIndex = ((int)vertexPoint.x + (int)vertexPoint.z * Constants.CHUNK_VERTEX_SIZE + (int)vertexPoint.y * Constants.CHUNK_VERTEX_AREA) * Constants.CHUNK_POINT_BYTE ;
+        int byteIndex = ((int)vertexPoint.x + (int)vertexPoint.z * Constants.CHUNK_VERTEX_SIZE + (int)vertexPoint.y * Constants.CHUNK_VERTEX_AREA) * Constants.CHUNK_POINT_BYTE;
 
         int value = data[byteIndex];
         int newValue = Mathf.Clamp(value + modification, 0, 255);
@@ -97,7 +97,6 @@ public class Chunk : MonoBehaviour
             return;
         if (value < isoSurface && newValue >= isoSurface)
             data[byteIndex + 1] = (byte)mat;
-
 
         data[byteIndex] = (byte)newValue;
         modified = true; //Don't direct change because some vertex are modifier in the same editions, wait to next frame
@@ -117,24 +116,23 @@ public class Chunk : MonoBehaviour
     /// </summary>
     public void saveChunkInRegion()
     {
-        if(changesUnsaved)
+        if (changesUnsaved)
             fatherRegion.saveChunkData(data, Xpos, Zpos);
     }
 
 #if UNITY_EDITOR
+
     //Used for visual debug
-    void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         if (debug)
         {
             //Gizmos.color = new Color(1f,0.28f,0f);
             Gizmos.color = Color.Lerp(Color.red, Color.magenta, ((transform.position.x + transform.position.z) % 100) / 100);
 
-
-            Gizmos.DrawWireCube(transform.position,new Vector3(Constants.CHUNK_SIDE, Constants.MAX_HEIGHT * Constants.VOXEL_SIDE, Constants.CHUNK_SIDE));
+            Gizmos.DrawWireCube(transform.position, new Vector3(Constants.CHUNK_SIDE, Constants.MAX_HEIGHT * Constants.VOXEL_SIDE, Constants.CHUNK_SIDE));
         }
     }
+
 #endif
 }
-
-
