@@ -302,7 +302,7 @@ PrefabInstance:
     - target: {fileID: 3206755284426175507, guid: 0dd8af356d25ee441896c42d31ada3b4,
         type: 3}
       propertyPath: chunkViewDistance
-      value: 16
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 3577543227352792563, guid: 0dd8af356d25ee441896c42d31ada3b4,
         type: 3}

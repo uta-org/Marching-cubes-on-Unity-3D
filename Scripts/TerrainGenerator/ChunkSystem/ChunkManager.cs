@@ -8,7 +8,7 @@ public class ChunkManager : Singleton<ChunkManager>
     [Tooltip("Material used by all the terrain.")]
     public Material terrainMaterial;
 
-    [Range(3, Constants.REGION_SIZE / 2)]
+    [Range(3, Constants.REGION_SIZE)]
     [Tooltip("Chunks load and visible for the player,radius distance.")]
     public int chunkViewDistance = 10;
 

@@ -6,7 +6,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class MeshBuilder : Singleton<MeshBuilder>
+public class MeshBuilderDualContouringI : Singleton<MeshBuilderDualContouringI>
 {
     [Tooltip("Value from which the vertices are inside the figure")]
     [Range(0, 255)]

@@ -26,7 +26,7 @@ public class VoxelChunk : MonoBehaviour
         fatherRegion = region;
         changesUnsaved = save;
 
-        Mesh myMesh = MeshBuilder.Instance.BuildChunk(b);
+        Mesh myMesh = MeshBuilderDualContouringI.Instance.BuildChunk(b);
         GetComponent<MeshFilter>().mesh = myMesh;
 
         //Assign random color, new material each chunk.
@@ -45,7 +45,7 @@ public class VoxelChunk : MonoBehaviour
             modified = false;
             changesUnsaved = true;
 
-            Mesh myMesh = MeshBuilder.Instance.BuildChunk(data);
+            Mesh myMesh = MeshBuilderDualContouringI.Instance.BuildChunk(data);
             GetComponent<MeshFilter>().mesh = myMesh;
             GetComponent<MeshCollider>().sharedMesh = myMesh;
         }
@@ -87,7 +87,7 @@ public class VoxelChunk : MonoBehaviour
     /// </summary>
     public void addTerrain(Vector3 vertexPoint, int modification, int mat)
     {
-        int isoSurface = MeshBuilder.Instance.isoLevel;
+        int isoSurface = MeshBuilderDualContouringI.Instance.isoLevel;
         int byteIndex = ((int)vertexPoint.x + (int)vertexPoint.z * Constants.CHUNK_VERTEX_SIZE + (int)vertexPoint.y * Constants.CHUNK_VERTEX_AREA) * Constants.CHUNK_POINT_BYTE;
 
         int value = data[byteIndex];
